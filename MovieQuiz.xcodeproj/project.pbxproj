@@ -18,8 +18,6 @@
 		AD7AFA552836189F00399704 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AFA542836189F00399704 /* Array+Extensions.swift */; };
 		C75FA6E62CEE44820021C793 /* YS Display-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C75FA6E42CEE44820021C793 /* YS Display-Medium.ttf */; };
 		C75FA6E72CEE44820021C793 /* YS Display-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C75FA6E32CEE44820021C793 /* YS Display-Bold.ttf */; };
-		C75FA6E92CEE46930021C793 /* UIButton+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75FA6E82CEE46930021C793 /* UIButton+Extensions.swift */; };
-		C75FA6EB2CEE47270021C793 /* TextFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75FA6EA2CEE47270021C793 /* TextFont+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,8 +34,6 @@
 		AD7AFA542836189F00399704 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		C75FA6E32CEE44820021C793 /* YS Display-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Bold.ttf"; sourceTree = "<group>"; };
 		C75FA6E42CEE44820021C793 /* YS Display-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Medium.ttf"; sourceTree = "<group>"; };
-		C75FA6E82CEE46930021C793 /* UIButton+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extensions.swift"; sourceTree = "<group>"; };
-		C75FA6EA2CEE47270021C793 /* TextFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextFont+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,8 +117,6 @@
 				AD5EE5DD284D7887003966EF /* UIColor+Extensions.swift */,
 				AD7AFA542836189F00399704 /* Array+Extensions.swift */,
 				AD77F5732857F8810062FB14 /* Date+Extensions.swift */,
-				C75FA6E82CEE46930021C793 /* UIButton+Extensions.swift */,
-				C75FA6EA2CEE47270021C793 /* TextFont+Extensions.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -211,9 +205,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AD5EE5DE284D7887003966EF /* UIColor+Extensions.swift in Sources */,
-				C75FA6E92CEE46930021C793 /* UIButton+Extensions.swift in Sources */,
 				AD7AFA552836189F00399704 /* Array+Extensions.swift in Sources */,
-				C75FA6EB2CEE47270021C793 /* TextFont+Extensions.swift in Sources */,
 				AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */,
 				AD77F5742857F8810062FB14 /* Date+Extensions.swift in Sources */,
 				AD1ABAB22831907B00B3E448 /* AppDelegate.swift in Sources */,
