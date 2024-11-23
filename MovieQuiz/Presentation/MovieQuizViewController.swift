@@ -149,7 +149,6 @@ final class MovieQuizViewController: UIViewController {
 /*
  Mock-данные
  
- 
  Картинка: The Godfather
  Настоящий рейтинг: 9,2
  Вопрос: Рейтинг этого фильма больше чем 6?
