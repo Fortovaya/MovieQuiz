@@ -4,6 +4,7 @@
 //
 //  Created by Алина on 07.12.2024.
 //
+
 import Foundation
 
 struct AlertModel {

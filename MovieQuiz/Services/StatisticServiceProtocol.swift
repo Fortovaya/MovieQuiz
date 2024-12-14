@@ -8,10 +8,9 @@
 import Foundation
 
 protocol StatisticServiceProtocol {
-    var gamesCount: Int { get } // кол-во завершенных игр
-    var bestGame: GameResult { get } // информация о лучшей попытке
-    var totalAccuracy: Double { get } // средняя точность правильных ответов за все игры в процентах
+    var gamesCount: Int { get }
+    var bestGame: GameResult { get }
+    var totalAccuracy: Double { get }
     
-    // метод сохранения текущего результата игры
     func store(correct count: Int, total amount: Int)
 }
