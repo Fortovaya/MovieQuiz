@@ -5,10 +5,9 @@
 //  Created by Алина on 30.11.2024.
 //
 
-import Foundation
+import UIKit
 
-// MARK: -  Struct
-private struct QuizStepViewModel {
+struct QuizStepViewModel {
     let image: UIImage
     let question: String
     let questionNumber: String
