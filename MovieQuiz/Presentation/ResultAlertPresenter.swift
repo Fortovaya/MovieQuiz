@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ResultAlertPresenter: AlertPresenterProtocol {
+final class ResultAlertPresenter: AlertPresenterProtocol {
     private weak var delegate: UIViewController?
     
     init(delegate: UIViewController?) {
