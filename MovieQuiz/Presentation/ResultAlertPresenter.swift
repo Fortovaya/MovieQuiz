@@ -7,11 +7,11 @@
 
 import UIKit
 
-final class ResultAlertPresenter {
-    private weak var viewController: UIViewController?
+class ResultAlertPresenter: AlertPresenterProtocol {
+    private weak var delegate: UIViewController?
     
-    init(viewController: UIViewController) {
-        self.viewController = viewController
+    init(delegate: UIViewController?) {
+        self.delegate = delegate
     }
     
     func showAlert(with model: AlertModel) {
@@ -26,6 +26,8 @@ final class ResultAlertPresenter {
         }
         
         alert.addAction(action)
-        viewController?.present(alert, animated: true, completion: nil)
+        
+        guard let delegate = delegate else { return }
+        delegate.present(alert, animated: true, completion: nil)
     }
 }

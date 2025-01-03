@@ -7,50 +7,55 @@
 
 import Foundation
 
-final class StatisticServiceImplementation: StatisticServiceProtocol {
-    
-    private enum Keys: String {
-        case correct
-        case bestGame
-        case gamesCount
-        case bestGameTotal
-        case bestGameDate
-    }
-    
+final class StatisticServiceImplementation {
     private let storage: UserDefaults = .standard
     
-    private var correct: Int {
+    enum Keys: String {
+        case correctAnswers
+        case gamesCount
+        case bestGameСorrect
+        case bestGameTotal
+        case bestGameDate
+        case totalAccuracy
+    }
+}
+
+extension StatisticServiceImplementation: StatisticServiceProtocol {
+    
+    var correctAnswers: Int {
         get {
-            return storage.integer(forKey: Keys.correct.rawValue)
+            return storage.integer(forKey: Keys.correctAnswers.rawValue)
         }
         set {
-            storage.set(newValue, forKey: Keys.correct.rawValue)
+            storage.set(newValue, forKey: Keys.correctAnswers.rawValue)
         }
     }
     
     var gamesCount: Int {
         get {
-            storage.integer(forKey: Keys.gamesCount.rawValue)
+            return storage.integer(forKey: Keys.gamesCount.rawValue)
         }
         set {
             storage.set(newValue, forKey: Keys.gamesCount.rawValue)
         }
     }
+    
     var bestGame: GameResult {
         get {
-            let correct = storage.integer(forKey: Keys.bestGame.rawValue)
+            let correct = storage.integer(forKey: Keys.bestGameСorrect.rawValue)
             let total = storage.integer(forKey: Keys.bestGameTotal.rawValue)
             let date = storage.object(forKey: Keys.bestGameDate.rawValue) as? Date ?? Date()
             return GameResult(correct: correct, total: total, date: date)
         }
-        set {
-            storage.set(newValue.correct, forKey: Keys.bestGame.rawValue)
+        set(newValue) {
+            storage.set(newValue.correct, forKey: Keys.bestGameСorrect.rawValue)
             storage.set(newValue.total, forKey: Keys.bestGameTotal.rawValue)
             storage.set(newValue.date, forKey: Keys.bestGameDate.rawValue)
         }
     }
+    
     var totalAccuracy: Double {
-        return gamesCount == 0 ? 0.0 : Double(correct) / Double(gamesCount * 10) * 100.0
+        Double(correctAnswers) / Double(gamesCount * 10) * 100.0
     }
     
     func store(correct count: Int, total amount: Int) {
@@ -58,7 +63,7 @@ final class StatisticServiceImplementation: StatisticServiceProtocol {
         if newGame.isBetterThan(bestGame) {
             bestGame = newGame
         }
-        correct += count
+        correctAnswers += count
         gamesCount += 1
     }
 }
