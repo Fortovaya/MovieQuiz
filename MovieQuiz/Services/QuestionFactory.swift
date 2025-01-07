@@ -11,8 +11,15 @@ final class QuestionFactory: QuestionFactoryProtocol {
     
     private let moviesLoader: MoviesLoading
     private weak var delegate: QuestionFactoryDelegate?
+    
     private var movies: [MostPopularMovie] = []
     
+    init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate) {
+        self.delegate = delegate
+        self.moviesLoader = moviesLoader
+    }
+    
+    // массив вопросов
     //    private let questions: [QuizQuestion] = [
     //        QuizQuestion(image: "The Godfather", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
     //        QuizQuestion(image: "The Dark Knight", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
@@ -23,31 +30,11 @@ final class QuestionFactory: QuestionFactoryProtocol {
     //        QuizQuestion(image: "Old", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
     //        QuizQuestion(image: "The Ice Age Adventures of Buck Wild", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
     //        QuizQuestion(image: "Tesla", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
-    //        QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
+    //        QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
     //    ]
     
-    init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate?) {
-        self.moviesLoader = moviesLoader
-        self.delegate = delegate
-    }
-    
-    func loadData() {
-        moviesLoader.loadMovies { [weak self] result in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                switch result {
-                case .success(let mostPopularMovies):
-                    self.movies = mostPopularMovies.items
-                    self.delegate?.didLoadDataFromServer()
-                case .failure(let error):
-                    self.delegate?.didFailToLoadData(with: error)
-                }
-            }
-        }
-    }
-    
     // метод генерации случайного вопроса
-    func requestNextQuestion(){
+    func requestNextQuestion() {
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
             let index = (0..<self.movies.count).randomElement() ?? 0
@@ -59,19 +46,45 @@ final class QuestionFactory: QuestionFactoryProtocol {
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-                print("Failed to load image")
+                // Обработка ошибки: передаем ошибку через делегат
+                DispatchQueue.main.async { [weak self] in
+                    self?.delegate?.didFailToLoadData(with: NSError(domain: "com.moviequiz", code: 0, userInfo: [NSLocalizedDescriptionKey: "Не удалось загрузить изображение"]))
+                }
+                return
             }
             
             let rating = Float(movie.rating) ?? 0
+            
             let text = "Рейтинг этого фильма больше чем 7?"
             let correctAnswer = rating > 7
             
-            let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
+            let question = QuizQuestion(image: imageData,
+                                        text: text,
+                                        correctAnswer: correctAnswer)
             
-            // Отправляем вопрос на главный поток
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.delegate?.didReceiveNextQuestion(question: question)
+            }
+        }
+    }
+    
+    func loadData() {
+        moviesLoader.loadMovies { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                switch result {
+                case .success(let mostPopularMovies):
+                    if !mostPopularMovies.errorMessage.isEmpty || mostPopularMovies.items.isEmpty {
+                        let errorMessage = mostPopularMovies.errorMessage.isEmpty ? "Нет доступных фильмов." : mostPopularMovies.errorMessage
+                        self.delegate?.didFailToLoadData(with: NSError(domain: "com.moviequiz", code: 0, userInfo: [NSLocalizedDescriptionKey: errorMessage]))
+                    } else {
+                        self.movies = mostPopularMovies.items
+                        self.delegate?.didLoadDataFromServer()
+                    }
+                case .failure(let error):
+                    self.delegate?.didFailToLoadData(with: error)
+                }
             }
         }
     }
