@@ -30,6 +30,6 @@ final class ResultAlertPresenter {
     }
     //скрытие алерта при Error
     func closeAlert() {
-           viewController?.dismiss(animated: true, completion: nil)
-       }
+        viewController?.dismiss(animated: true, completion: nil)
+    }
 }

@@ -33,7 +33,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.cornerRadius = 20
         
         alertPresenter = ResultAlertPresenter(viewController: self)
-
+        
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticServiceImplementation()
         
@@ -170,8 +170,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         hideLoadingIndicator()
         
         let model = AlertModel(title: "Ошибка",
-                                    message: message,
-                                    buttonText: "Попробовать еще раз") { [weak self] in
+                               message: message,
+                               buttonText: "Попробовать еще раз") { [weak self] in
             guard let self = self else { return }
             
             self.questionFactory?.loadData()
