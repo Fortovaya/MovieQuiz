@@ -16,7 +16,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     
-    private var alertPresenter: AlertPresenterProtocol?
+    private var alertPresenter: ResultAlertPresenter?
     private var statisticService: StatisticServiceProtocol?
     
     
@@ -24,13 +24,24 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        alertPresenter = ResultAlertPresenter(delegate: self)
+        imageView.backgroundColor = .clear
+        textLabel.text = ""
+        counterLabel.text = ""
+        
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.cornerRadius = 20
+        
+        alertPresenter = ResultAlertPresenter(viewController: self)
+
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticServiceImplementation()
         
-        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        guard let questionFactory = questionFactory else { return }
+        questionFactory.loadData()
         
+        activityIndicator.hidesWhenStopped = true
         showLoadingIndicator()
-        questionFactory?.loadData()
     }
     
     //MARK: - QuestionFactoryDelegate
@@ -40,7 +51,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         currentQuestion = question
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
+            guard let self = self else { return }
+            self.show(quiz: viewModel)
         }
     }
     
@@ -63,11 +75,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //MARK: - private func
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
+        return QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return questionStep
     }
     
     private func show(quiz step: QuizStepViewModel) {
@@ -80,15 +91,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         if isCorrect {
             correctAnswers += 1
         }
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
-        imageView.layer.cornerRadius = 20
+        
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.showNextQuestionOrResults()
-            self.imageView.layer.borderWidth = 0
+            self.imageView.layer.borderColor = UIColor.clear.cgColor
             self.blockButton(isEnabled: true)
         }
     }
@@ -96,8 +105,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // приватный метод, который содержит логику перехода в один из сценариев
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
-            guard let statisticService else { return }
+            guard let statisticService = statisticService else { return }
             statisticService.store(correct: correctAnswers, total: questionsAmount)
+            
             let message = getGamesStatistic(correct: correctAnswers, total: questionsAmount)
             let alertModel = AlertModel(title: "Этот раунд окончен",
                                         message: message,
@@ -142,35 +152,32 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true // скрываем индикатор загрузки
+        hideLoadingIndicator()
+        alertPresenter?.closeAlert()
         questionFactory?.requestNextQuestion()
     }
     
     //отображение индикатора
     private func showLoadingIndicator(){
-        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
     //скрытие индикатора
     private func hideLoadingIndicator(){
         activityIndicator.stopAnimating()
-        activityIndicator.isHidden = true
     }
     
     private func showNetworkError(message: String) {
         hideLoadingIndicator()
         
-        let alertModel = AlertModel(title: "Ошибка",
+        let model = AlertModel(title: "Ошибка",
                                     message: message,
                                     buttonText: "Попробовать еще раз") { [weak self] in
-            guard let self else { return }
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
+            guard let self = self else { return }
             
-            self.questionFactory?.requestNextQuestion()
+            self.questionFactory?.loadData()
         }
         
-        alertPresenter?.showAlert(with: alertModel)
+        alertPresenter?.showAlert(with: model)
     }
 }
 
