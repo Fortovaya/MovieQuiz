@@ -28,4 +28,8 @@ final class ResultAlertPresenter {
         alert.addAction(action)
         viewController?.present(alert, animated: true, completion: nil)
     }
+    //скрытие алерта при Error
+    func closeAlert() {
+        viewController?.dismiss(animated: true, completion: nil)
+    }
 }
