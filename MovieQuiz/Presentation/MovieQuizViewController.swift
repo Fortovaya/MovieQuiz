@@ -44,6 +44,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showLoadingIndicator()
     }
     
+    // MARK: - Стиль статус-бара
+       override var preferredStatusBarStyle: UIStatusBarStyle {
+           return .lightContent
+       }
+    
     //MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?){
         guard let question = question else { return }
@@ -157,7 +162,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory?.requestNextQuestion()
     }
     
-    //отображение индикатора
+    // отображение индикатора
     private func showLoadingIndicator(){
         activityIndicator.startAnimating()
     }
