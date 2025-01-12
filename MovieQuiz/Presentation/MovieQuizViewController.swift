@@ -12,7 +12,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var correctAnswers: Int = .zero
     private var questionFactory: QuestionFactoryProtocol?
     
-    private var alertPresenter: ResultAlertPresenter?
+    var alertPresenter: ResultAlertPresenter?
     private var statisticService: StatisticServiceProtocol?
     
     private let presenter = MovieQuizPresenter()
@@ -49,33 +49,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
        override var preferredStatusBarStyle: UIStatusBarStyle {
            return .lightContent
        }
-    
     //MARK: - QuestionFactoryDelegate
-    func didReceiveNextQuestion(question: QuizQuestion?){
-        guard let question = question else { return }
-        
-        currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.show(quiz: viewModel)
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+            presenter.didReceiveNextQuestion(question: question)
         }
-    }
-    
+
     //MARK: - @IBAction
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        presenter.currentQuestion = currentQuestion
         presenter.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        presenter.currentQuestion = currentQuestion
         presenter.noButtonClicked()
     }
     
     //MARK: - private func
     
-    private func show(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
@@ -90,49 +80,52 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            self.showNextQuestionOrResults()
+            self.presenter.correctAnswers = self.correctAnswers
+            self.presenter.questionFactory = self.questionFactory
+            self.presenter.showNextQuestionOrResults()
+            
+            
             self.imageView.layer.borderColor = UIColor.clear.cgColor
-            self.blockButton(isEnabled: true)
         }
     }
     
     // приватный метод, который содержит логику перехода в один из сценариев
-    private func showNextQuestionOrResults() {
-        if presenter.isLastQuestion() {
-            guard let statisticService = statisticService else { return }
-            statisticService.store(correct: correctAnswers, total:presenter.questionsAmount)
-            
-            let message = getGamesStatistic(correct: correctAnswers, total: presenter.questionsAmount)
-            let alertModel = AlertModel(title: "Этот раунд окончен",
-                                        message: message,
-                                        buttonText: "Сыграть еще раз",
-                                        completion: { [weak self] in
-                self?.presenter.resetQuestionIndex()
-                self?.correctAnswers = .zero
-                guard let questionFactory = self?.questionFactory else { return }
-                questionFactory.requestNextQuestion()
-            }
-            )
-            
-            guard let alertPresenter else { return }
-            alertPresenter.showAlert(with: alertModel)
-        } else {
-            presenter.switchToNextQuestion()
-            guard let questionFactory = questionFactory else { return }
-            questionFactory.requestNextQuestion()
-        }
-    }
-    
-    private func getGamesStatistic(correct count: Int, total amount: Int) -> String {
-        guard let statisticService = statisticService else { return "Ваш результат: \(count)/\(amount)"}
-        
-        let score = "Ваш результат: \(count)/\(amount)"
-        let gamesCount = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-        let record = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))"
-        let totalAccuracy = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
-        
-        return [score, gamesCount, record, totalAccuracy].joined(separator: "\n")
-    }
+//    private func showNextQuestionOrResults() {
+//        if presenter.isLastQuestion() {
+//            guard let statisticService = statisticService else { return }
+//            statisticService.store(correct: correctAnswers, total:presenter.questionsAmount)
+//            
+//            let message = getGamesStatistic(correct: correctAnswers, total: presenter.questionsAmount)
+//            let alertModel = AlertModel(title: "Этот раунд окончен",
+//                                        message: message,
+//                                        buttonText: "Сыграть еще раз",
+//                                        completion: { [weak self] in
+//                self?.presenter.resetQuestionIndex()
+//                self?.correctAnswers = .zero
+//                guard let questionFactory = self?.questionFactory else { return }
+//                questionFactory.requestNextQuestion()
+//            }
+//            )
+//            
+//            guard let alertPresenter else { return }
+//            alertPresenter.showAlert(with: alertModel)
+//        } else {
+//            presenter.switchToNextQuestion()
+//            guard let questionFactory = questionFactory else { return }
+//            questionFactory.requestNextQuestion()
+//        }
+//    }
+//    
+//    private func getGamesStatistic(correct count: Int, total amount: Int) -> String {
+//        guard let statisticService = statisticService else { return "Ваш результат: \(count)/\(amount)"}
+//        
+//        let score = "Ваш результат: \(count)/\(amount)"
+//        let gamesCount = "Количество сыгранных квизов: \(statisticService.gamesCount)"
+//        let record = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))"
+//        let totalAccuracy = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
+//        
+//        return [score, gamesCount, record, totalAccuracy].joined(separator: "\n")
+//    }
     
     private func blockButton(isEnabled: Bool) {
         noButton.isEnabled = isEnabled
