@@ -10,14 +10,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
     private var correctAnswers: Int = .zero
-    
     private var questionFactory: QuestionFactoryProtocol?
-    private var currentQuestion: QuizQuestion?
     
     private var alertPresenter: ResultAlertPresenter?
     private var statisticService: StatisticServiceProtocol?
     
     private let presenter = MovieQuizPresenter()
+    private var currentQuestion: QuizQuestion?
     
     
     // MARK: - Lifecycle
@@ -42,6 +41,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         activityIndicator.hidesWhenStopped = true
         showLoadingIndicator()
+        
+        presenter.viewController = self
     }
     
     // MARK: - Стиль статус-бара
@@ -63,19 +64,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //MARK: - @IBAction
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else { return }
-        let givenAnswer = true
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        blockButton(isEnabled: false)
+        presenter.currentQuestion = currentQuestion
+        presenter.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else { return }
-        let givenAnswer = false
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        blockButton(isEnabled: false)
+        presenter.currentQuestion = currentQuestion
+        presenter.noButtonClicked()
     }
     
     //MARK: - private func
@@ -86,7 +81,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         counterLabel.text = step.questionNumber
     }
     
-    private func showAnswerResult(isCorrect: Bool) {
+    func showAnswerResult(isCorrect: Bool) {
         if isCorrect {
             correctAnswers += 1
         }
