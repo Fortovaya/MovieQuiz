@@ -6,7 +6,7 @@
 //
 import UIKit
 
-final class MovieQuizPresenter {
+final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = .zero
@@ -16,8 +16,14 @@ final class MovieQuizPresenter {
     var questionFactory: QuestionFactoryProtocol?
     private var statisticService: StatisticServiceProtocol = StatisticServiceImplementation()
     
-    var correctAnswers: Int = .zero
+    private(set) var correctAnswers: Int = .zero
     
+    init(viewController: MovieQuizViewController) {
+        self.viewController = viewController
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        questionFactory?.loadData()
+        viewController.showLoadingIndicator()
+    }
     
     func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
@@ -38,6 +44,18 @@ final class MovieQuizPresenter {
         currentQuestionIndex += 1
     }
     
+    func restartGame() {
+        correctAnswers = 0
+        currentQuestionIndex = 0
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
+    }
+    
     func yesButtonClicked() {
         didAnswer(isYes: true)
     }
@@ -56,9 +74,23 @@ final class MovieQuizPresenter {
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    //MARK: - QuestionFactoryDelegate
-    func didReceiveNextQuestion(question: QuizQuestion?){
-        guard let question = question else { return }
+    // MARK: - QuestionFactoryDelegate
+    
+    func didLoadDataFromServer() {
+        viewController?.hideLoadingIndicator()
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        let message = error.localizedDescription
+        viewController?.showNetworkError(message: message)
+    }
+    
+
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
         
         currentQuestion = question
         let viewModel = convert(model: question)
@@ -79,9 +111,7 @@ final class MovieQuizPresenter {
                                         message: message,
                                         buttonText: "Сыграть еще раз",
                                         completion: { [weak self] in
-                self?.resetQuestionIndex()
-                self?.correctAnswers = .zero
-                guard (self?.questionFactory) != nil else { return }
+                self?.restartGame()
                 self?.questionFactory?.requestNextQuestion()
             }
             )
@@ -96,8 +126,6 @@ final class MovieQuizPresenter {
     }
     
     func getGamesStatistic(correct count: Int, total amount: Int) -> String {
-//        guard let statisticService = statisticService else { return "Ваш результат: \(count)/\(amount)"}
-        
         let score = "Ваш результат: \(count)/\(amount)"
         let gamesCount = "Количество сыгранных квизов: \(statisticService.gamesCount)"
         let record = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))"
@@ -105,7 +133,19 @@ final class MovieQuizPresenter {
         
         return [score, gamesCount, record, totalAccuracy].joined(separator: "\n")
     }
-
     
+    
+  
+    
+    
+    
+    
+   
+    
+ 
+    
+ 
+    
+   
 }
 
