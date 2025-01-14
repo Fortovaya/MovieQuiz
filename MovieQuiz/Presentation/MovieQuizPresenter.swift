@@ -16,7 +16,7 @@ final class MovieQuizPresenter:MovieQuizPresenterProtocol, QuestionFactoryDelega
     
     private var currentQuestion: QuizQuestion?
     
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     private var questionFactory: QuestionFactoryProtocol?
     private var statisticService: StatisticServiceProtocol
     
@@ -25,7 +25,7 @@ final class MovieQuizPresenter:MovieQuizPresenterProtocol, QuestionFactoryDelega
     private var currentQuestionIndex: Int = .zero
     
     init(viewController: MovieQuizViewControllerProtocol) {
-        self.viewController = viewController as? MovieQuizViewController
+        self.viewController = viewController
         self.statisticService = StatisticServiceImplementation()
         self.questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         self.questionFactory?.loadData()
@@ -91,8 +91,6 @@ final class MovieQuizPresenter:MovieQuizPresenterProtocol, QuestionFactoryDelega
                 self?.questionFactory?.requestNextQuestion()
             })
             viewController?.showAlert(with: alertModel)
-            //            guard let alertPresenter = viewController?.alertPresenter else { return }
-            //            alertPresenter.showAlert(with: alertModel)
         } else {
             self.switchToNextQuestion()
             guard let questionFactory = questionFactory else { return }
