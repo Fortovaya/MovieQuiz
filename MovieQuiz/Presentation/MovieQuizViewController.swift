@@ -9,7 +9,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBOutlet private weak var yesButton: UIButton!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
-    private var presenter: MovieQuizPresenter!
+    private var presenter: MovieQuizPresenter?
     
     private var alertPresenter: ResultAlertPresenter?
     private var statisticService: StatisticServiceProtocol?
@@ -44,10 +44,12 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     
     //MARK: - @IBAction
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        guard let presenter = presenter else { return }
         presenter.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
+        guard let presenter = presenter else { return }
         presenter.noButtonClicked()
     }
     
@@ -95,7 +97,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         
         let action = UIAlertAction(title: "Попробовать ещё раз", style: .default) { [weak self] _ in
             guard let self = self else { return }
-            self.presenter.restartGame()
+            self.presenter?.restartGame()
         }
         
         alert.addAction(action)
