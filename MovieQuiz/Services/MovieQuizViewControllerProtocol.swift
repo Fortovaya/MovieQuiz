@@ -14,4 +14,5 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     func showNetworkError(message: String)
     func resetImageBorder()
     func blockButton(isEnabled: Bool)
+    func showAlert(with model: AlertModel)
 }
