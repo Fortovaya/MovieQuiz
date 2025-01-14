@@ -11,7 +11,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     
     private var presenter: MovieQuizPresenter!
     
-    var alertPresenter: ResultAlertPresenter?
+    private var alertPresenter: ResultAlertPresenter?
     private var statisticService: StatisticServiceProtocol?
     
     // MARK: - Lifecycle
@@ -56,6 +56,10 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
+    }
+    
+    func showAlert(with model: AlertModel) {
+        alertPresenter?.showAlert(with: model)
     }
     
     func highlightImageBorder(isCorrectAnswer: Bool) {

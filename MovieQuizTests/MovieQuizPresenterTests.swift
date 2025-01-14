@@ -1,13 +1,5 @@
 //
 //  MovieQuizViewControllerMock.swift
-//  MovieQuiz
-//
-//  Created by Алина on 12.01.2025.
-//
-
-
-//
-//  MovieQuizViewControllerMock.swift
 //  MovieQuizViewControllerMock
 //
 //  Created by Алина on 12.01.2025.
@@ -47,6 +39,10 @@ final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
     
     
     func blockButton(isEnabled: Bool) {
+        
+    }
+    
+    func showAlert(with model: MovieQuiz.AlertModel) {
         
     }
 }
