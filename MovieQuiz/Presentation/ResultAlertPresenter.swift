@@ -7,7 +7,8 @@
 
 import UIKit
 
-final class ResultAlertPresenter {
+final class ResultAlertPresenter: AlertPresenterProtocol {
+    
     private weak var viewController: UIViewController?
     
     init(viewController: UIViewController) {
@@ -27,9 +28,10 @@ final class ResultAlertPresenter {
         
         alert.addAction(action)
         viewController?.present(alert, animated: true, completion: nil)
-    }
-    //скрытие алерта при Error
-    func closeAlert() {
-        viewController?.dismiss(animated: true, completion: nil)
+        
+#if DEBUG
+        alert.view.accessibilityIdentifier = "AlertPresenter"
+#endif
+        
     }
 }
